@@ -31,18 +31,22 @@
 #include "stb/stb_image_resize.h"
 
 #include <vector>
+#include <functional>
 #include <fstream>
+#include <sstream>
 
 namespace taskgen
 {
   enum class Format
   {
-    JPG, PNG, TGA, BMP, ANSI256
+    JPG, PNG, TGA, BMP
   };
   
-  enum class Color
+  struct Color
   {
-    R, G, B
+    int R;
+    int G;
+    int B;
   };
   
   class Pic
@@ -76,12 +80,22 @@ namespace taskgen
       fs.close();
     }
   
+    std::string string(Format fmt, size_t width, size_t height) const
+    {
+      std::stringstream ss;
+      paint(fmt, ss, width, height);
+      return ss.str();
+    }
+  
+    std::string string(Format fmt, size_t enlarge) const
+    {
+      std::stringstream ss;
+      paint(fmt, ss, enlarge);
+      return ss.str();
+    }
+  
     void paint(Format fmt, std::ostream &os, size_t width, size_t height) const
     {
-      if (fmt == Format::ANSI256)
-      {
-        throw Error(TASKGEN_ERROR_LOCATION, __func__, "Unsupported format(ANSI256) when writing to file");
-      }
       size_t enlarge = (std::max(width, height) / data.size()) - 1;
       auto pic = load_pic(enlarge);
       auto out = (unsigned char *) malloc(
@@ -96,7 +110,7 @@ namespace taskgen
       pic.data = out;
       pic.width = static_cast<int>(width);
       pic.height = static_cast<int>(height);
-      write_pic(fmt, os, pic);
+      write_to_stream(fmt, os, pic);
       stbi_image_free(out);
     }
   
@@ -106,43 +120,14 @@ namespace taskgen
       {
         throw Error(TASKGEN_ERROR_LOCATION, __func__, "enlarge must >= 1.");
       }
-      switch (fmt)
-      {
-//        case Format::ANSI256:
-//          for (int i = static_cast<int>(data.size() - 1); i >= 0; --i)
-//          {
-//            for (int l = 0; l < enlarge; ++l)
-//            {
-//              for (int j = 0; j < data.size(); ++j)
-//              {
-//                for (int l = 0; l < enlarge; ++l)
-//                {
-//                  if (data[j][i])
-//                  {
-//                    os << "\033[48;5;16m  \033[0m";
-//                  }
-//                  else
-//                  {
-//                    os << "\033[48;5;231m  \033[0m";
-//                  }
-//                }
-//              }
-//              os << "\n";
-//            }
-//          }
-//          break;
-        default:
-        {
-          auto pic = load_pic(enlarge);
-          write_pic(fmt, os, pic);
-          stbi_image_free(pic.data);
-        }
-          break;
-      }
+      auto pic = load_pic(enlarge);
+      write_to_stream(fmt, os, pic);
+      stbi_image_free(pic.data);
     }
 
   private:
-    void write_pic(Format fmt, std::ostream &os, StbData data) const
+    void write(Format fmt, std::ostream &os, StbData data,
+                   const std::function<void(void *context, void *data, int size)>& writer) const
     {
       int ret = 0;
       auto func = [](void *context, void *data, int size)
@@ -170,7 +155,16 @@ namespace taskgen
         throw Error(TASKGEN_ERROR_LOCATION, __func__, std::string("write failed: ") + stbi_failure_reason());
       }
     }
-    
+    void write_to_stream(Format fmt, std::ostream &os, StbData data) const
+    {
+      auto func = [](void *context, void *data, int size)
+      {
+        auto osptr = reinterpret_cast<std::ostream *>(context);
+        osptr->write(reinterpret_cast<char *>(data), size);
+      };
+      write(fmt, os, data, func);
+    }
+  
     StbData load_pic(size_t enlarge) const
     {
       if (enlarge == 0)
@@ -195,24 +189,9 @@ namespace taskgen
           {
             for (int k = 0; k < enlarge; ++k)
             {
-              switch (data[j][i])
-              {
-                case Color::R:
-                  raw_ppm.emplace_back(255);
-                  raw_ppm.emplace_back(0);
-                  raw_ppm.emplace_back(0);
-                  break;
-                case Color::G:
-                  raw_ppm.emplace_back(0);
-                  raw_ppm.emplace_back(255);
-                  raw_ppm.emplace_back(0);
-                  break;
-                case Color::B:
-                  raw_ppm.emplace_back(0);
-                  raw_ppm.emplace_back(0);
-                  raw_ppm.emplace_back(255);
-                  break;
-              }
+              raw_ppm.emplace_back(data[j][i].R);
+              raw_ppm.emplace_back(data[j][i].G);
+              raw_ppm.emplace_back(data[j][i].B);
             }
           }
         }

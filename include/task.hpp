@@ -27,37 +27,64 @@
 
 namespace taskgen
 {
+  using Layer = std::array<Color, 15>;
+  constexpr Color RED{.R = 255, .G = 0, .B = 0};
+  constexpr Color GREEN{.R = 0, .G = 175, .B = 0};
+  constexpr Color BLUE{.R = 0, .G = 111, .B = 192};
   class Task
   {
   public:
-    std::array<Color, 30> task;
+    Layer upper;
+    Layer lower;
   public:
   std::tuple<Pic, Pic> generate_img() const
   {
-    std::vector<std::vector<Color>> data1(3);
-    std::vector<std::vector<Color>> data2(3);
+    std::vector<std::vector<Color>> upper_data(3);
+    std::vector<std::vector<Color>> lower_data(3);
     size_t i = 0;
-    data1[0].insert(data1[0].end(), task.begin(), task.begin() + 5);
-    data1[1].insert(data1[1].end(), task.begin() + 5, task.begin() + 10);
-    data1[2].insert(data1[2].end(), task.begin() + 10, task.begin() + 15);
-    data2[0].insert(data2[0].end(), task.begin() + 15, task.begin() + 20);
-    data2[1].insert(data2[1].end(), task.begin() + 20, task.begin() + 25);
-    data2[2].insert(data2[2].end(), task.begin() + 25, task.begin() + 30);
-    return {Pic{data1}, Pic{data2}};
+    upper_data[0].insert(upper_data[0].end(), upper.begin(), upper.begin() + 5);
+    upper_data[1].insert(upper_data[1].end(), upper.begin() + 5, upper.begin() + 10);
+    upper_data[2].insert(upper_data[2].end(), upper.begin() + 10, upper.begin() + 15);
+    lower_data[0].insert(lower_data[0].end(), lower.begin(), lower.begin() + 5);
+    lower_data[1].insert(lower_data[1].end(), lower.begin() + 5, lower.begin() + 10);
+    lower_data[2].insert(lower_data[2].end(), lower.begin() + 10, lower.begin() + 15);
+    return {Pic{upper_data}, Pic{lower_data}};
   }
   };
-  
+  Layer random_layer(size_t r, size_t g, size_t b)
+  {
+    if (r + g + b != 15)
+      throw Error(TASKGEN_ERROR_LOCATION, __func__, "R + G + B shall be 15.");
+    Layer ret;
+    std::fill(ret.begin(), ret.begin() + r, RED);
+    std::fill(ret.begin() + r, ret.begin() + r + g, GREEN);
+    std::fill(ret.begin() + r + g, ret.end(), BLUE);
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::shuffle(ret.begin(), ret.end(), std::default_random_engine(seed));
+    return ret;
+  }
   Task random_task(size_t r, size_t g, size_t b)
   {
     if(r + g + b != 30)
       throw Error(TASKGEN_ERROR_LOCATION, __func__, "R + G + B shall be 30.");
     std::array<Color, 30> task;
-    std::fill(task.begin(), task.begin() + r, Color::R);
-    std::fill(task.begin() + r, task.begin() + r + g, Color::G);
-    std::fill(task.begin() + r + g, task.end(), Color::B);
+    std::fill(task.begin(), task.begin() + r, RED);
+    std::fill(task.begin() + r, task.begin() + r + g, GREEN);
+    std::fill(task.begin() + r + g, task.end(), BLUE);
     unsigned seed = std::chrono::system_clock::now ().time_since_epoch ().count ();
     std::shuffle(task.begin(), task.end(), std::default_random_engine (seed));
-    return {task};
+    Layer upper;
+    Layer lower;
+    std::copy(task.begin(), task.begin() + 15, upper.begin());
+    std::copy(task.begin() + 15, task.end(), lower.begin());
+    return Task{upper, lower};
+  }
+  Task random_task(size_t ru, size_t rl, size_t gu, size_t gl, size_t bu, size_t bl)
+  {
+    return {
+        random_layer(ru, gu, bu),
+        random_layer(rl, gl, bl)
+    };
   }
 }
 #endif
