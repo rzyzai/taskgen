@@ -59,8 +59,8 @@ namespace taskgen
     std::fill(ret.begin(), ret.begin() + r, RED);
     std::fill(ret.begin() + r, ret.begin() + r + g, GREEN);
     std::fill(ret.begin() + r + g, ret.end(), BLUE);
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::shuffle(ret.begin(), ret.end(), std::default_random_engine(seed));
+    std::random_device rd;
+    std::shuffle(ret.begin(), ret.end(), std::default_random_engine(rd()));
     return ret;
   }
   Task random_task(size_t r, size_t g, size_t b)
@@ -71,8 +71,8 @@ namespace taskgen
     std::fill(task.begin(), task.begin() + r, RED);
     std::fill(task.begin() + r, task.begin() + r + g, GREEN);
     std::fill(task.begin() + r + g, task.end(), BLUE);
-    unsigned seed = std::chrono::system_clock::now ().time_since_epoch ().count ();
-    std::shuffle(task.begin(), task.end(), std::default_random_engine (seed));
+    std::random_device rd;
+    std::shuffle(task.begin(), task.end(), std::default_random_engine (rd()));
     Layer upper;
     Layer lower;
     std::copy(task.begin(), task.begin() + 15, upper.begin());
