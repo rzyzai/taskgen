@@ -11,3 +11,6 @@ DOBOT智造大挑战“航天英雄挑战赛”高中组任务卡生成器
 - cpp-httplib
 - cppcodec
 - stn
+
+## 日照一中AI社
+taskgen 来自[日照一中AI社](https://github.com/rzyzai)
