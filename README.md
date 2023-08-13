@@ -8,9 +8,9 @@ DOBOT智造大挑战“航天英雄挑战赛”高中组任务卡生成器
 ![example](example.png)
 
 ## 依赖
-- cpp-httplib
-- cppcodec
-- stn
+- [cpp-httplib](https://github.com/yhirose/cpp-httplib)
+- [cppcodec](https://github.com/tplgy/cppcodec)
+- [stb](https://github.com/nothings/stb)
 
 ## 日照一中AI社
 taskgen 来自[日照一中AI社](https://github.com/rzyzai)

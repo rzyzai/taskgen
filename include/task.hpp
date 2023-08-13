@@ -60,7 +60,7 @@ namespace taskgen
     std::fill(ret.begin() + r, ret.begin() + r + g, GREEN);
     std::fill(ret.begin() + r + g, ret.end(), BLUE);
     std::random_device rd;
-    std::shuffle(ret.begin(), ret.end(), std::default_random_engine(rd()));
+    std::shuffle(ret.begin(), ret.end(), std::mt19937(rd()));
     return ret;
   }
   Task random_task(size_t r, size_t g, size_t b)
@@ -72,7 +72,7 @@ namespace taskgen
     std::fill(task.begin() + r, task.begin() + r + g, GREEN);
     std::fill(task.begin() + r + g, task.end(), BLUE);
     std::random_device rd;
-    std::shuffle(task.begin(), task.end(), std::default_random_engine (rd()));
+    std::shuffle(task.begin(), task.end(), std::mt19937(rd()));
     Layer upper;
     Layer lower;
     std::copy(task.begin(), task.begin() + 15, upper.begin());
