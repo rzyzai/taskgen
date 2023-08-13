@@ -35,7 +35,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace taskgen
+namespace czh
 {
   enum class Format
   {

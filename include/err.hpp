@@ -20,7 +20,7 @@
 #define TASKGEN_STRINGFY(x) _TASKGEN_STRINGFY(x)
 #define _TASKGEN_STRINGFY(x) #x
 #define TASKGEN_ERROR_LOCATION  __FILE__ ":" TASKGEN_STRINGFY(__LINE__)
-namespace taskgen
+namespace czh
 {
   class Error : public std::runtime_error
   {

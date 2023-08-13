@@ -56,26 +56,26 @@ int main()
   httplib::Server svr;
   svr.Get("/", [](const auto & req, auto &res)
   {
-    taskgen::Task t;
+    czh::Task t;
     if(req.params.size() == 3)
     {
-      t = taskgen::random_task(std::stoi(req.get_param_value("r")), std::stoi(req.get_param_value("g")),
+      t = czh::random_task(std::stoi(req.get_param_value("r")), std::stoi(req.get_param_value("g")),
                                                                               std::stoi(req.get_param_value("b")));
     }
     else if(req.params.size() == 6)
     {
-      t = taskgen::random_task(std::stoi(req.get_param_value("ru")), std::stoi(req.get_param_value("rl")),
+      t = czh::random_task(std::stoi(req.get_param_value("ru")), std::stoi(req.get_param_value("rl")),
                                std::stoi(req.get_param_value("bu")), std::stoi(req.get_param_value("bl")),
                                std::stoi(req.get_param_value("gu")), std::stoi(req.get_param_value("gl")));
     }
     else
     {
-      t = taskgen::random_task(10, 10, 10);
+      t = czh::random_task(10, 10, 10);
     }
     auto[upper, lower] = t.generate_img();
     res.set_content(make_html(
-        upper.string(taskgen::Format::PNG, 100),
-        lower.string(taskgen::Format::PNG, 100)), "text/html");
+        upper.string(czh::Format::PNG, 100),
+        lower.string(czh::Format::PNG, 100)), "text/html");
   });
   svr.listen("0.0.0.0", 8080);
   return 0;

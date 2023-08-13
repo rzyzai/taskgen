@@ -25,7 +25,7 @@
 #include <vector>
 #include <fstream>
 
-namespace taskgen
+namespace czh
 {
   using Layer = std::array<Color, 15>;
   constexpr Color RED{.R = 255, .G = 0, .B = 0};
